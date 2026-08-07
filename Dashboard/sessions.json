@@ -1,0 +1,26 @@
+{
+  "updated": "2026-08-06",
+  "baseUrl": "http://127.0.0.1:4096",
+  "master": "ses_030c9fa9cffeW2D7dMU5l6Irv0",
+  "modules": {
+    "M1": "ses_0272170dcffeCBXCQgyueP3dN0",
+    "M2": "ses_027216a0bffeRO3561j7GF6VVF",
+    "M3": "ses_02721633bffe73oKDNIiGJEyyp",
+    "M4": "ses_027215c67ffejQgqIHGtjmagJh",
+    "M5": "ses_0272155a5ffeQ04Xf6q2D9KyU9",
+    "M6": "ses_027214ed4ffe67nOC3II3eZLDG",
+    "M7": "ses_027214793ffe6Dabc4ExHdsre7",
+    "M8": "ses_0272140c7ffeUX3EpRx9sE6iFm",
+    "M9": "ses_0272139e2ffe5qlI7i6s0zivmn",
+    "M10": "ses_027213309ffeOQICphM8vUI1Uu",
+    "M11": "ses_027212c2effew3jux6i8u5vPKw",
+    "M12": "ses_027212551ffeaBOSJNw8wb1GzA",
+    "M13": "ses_027211e59ffeR669ERNG3cTSRb",
+    "M14": "ses_027211741ffeFe9F2n0ge2Fs2z",
+    "M15": "ses_027211070ffeYg4Xbj4HNCPfxD",
+    "M16": "ses_027210996ffevLRPkUG8G7Jh8d",
+    "M17": "ses_0272102b8ffex7SqKPp9Z5R1CW",
+    "M18": "ses_02720fbecffeT0XLjqDB14fq1u",
+    "M19": "ses_02720f523ffeKbicdqzprphHxt"
+  }
+}

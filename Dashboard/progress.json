@@ -1,0 +1,33 @@
+{
+  "updated": "2026-08-07",
+  "modules": {
+    "M1": "inprogress",
+    "M2": "pending",
+    "M3": "pending",
+    "M4": "pending",
+    "M5": "pending",
+    "M6": "pending",
+    "M7": "pending",
+    "M8": "pending",
+    "M9": "pending",
+    "M10": "pending",
+    "M11": "pending",
+    "M12": "pending",
+    "M13": "pending",
+    "M14": "pending",
+    "M15": "pending",
+    "M16": "pending",
+    "M17": "pending",
+    "M18": "pending",
+    "M19": "pending"
+  },
+  "topics": {
+    "M1": ["M1-b0", "M1-b1", "M1-b2", "M1-b3", "M1-d0", "M1-d1", "M1-d2"]
+  },
+  "capstones": {
+    "L1": "pending",
+    "L2": "pending",
+    "L3": "pending",
+    "L4": "pending"
+  }
+}

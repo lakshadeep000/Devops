@@ -1,0 +1,326 @@
+{
+  "updated": "2026-08-07",
+  "modules": {
+    "M1": {
+      "topics": {
+        "basic": [
+          "Filesystem hierarchy & navigation",
+          "File permissions (chmod/chown)",
+          "Users, groups, sudo",
+          "Pipes, redirects, grep"
+        ],
+        "deep": [
+          "Special perms: sticky bit & setuid",
+          "Processes: ps, top, kill, signals",
+          "System health: df, du, free, uname",
+          "systemd: systemctl, journalctl, .service files",
+          "/proc & /sys virtual filesystems",
+          "Package mgmt (apt) + boot sequence"
+        ]
+      }
+    },
+    "M2": {
+      "topics": {
+        "basic": [
+          "Variables, args, conditionals, loops",
+          "Exit codes, && / ||",
+          "Shebang & executable scripts"
+        ],
+        "deep": [
+          "set -euo pipefail & error handling",
+          "trap for cleanup",
+          "Arrays, maps, string manipulation",
+          "Job control: &, jobs, fg, bg, wait",
+          "Advanced expansion & substitution",
+          "Functions & sourcing",
+          "getopts for flags",
+          "read loops & IFS"
+        ]
+      }
+    },
+    "M3": {
+      "topics": {
+        "basic": [
+          "grep, sed, cut, sort, uniq, wc"
+        ],
+        "deep": [
+          "Regex: anchors, groups, greedy vs lazy",
+          "sed scripting: ranges, in-place",
+          "awk: fields, patterns, BEGIN/END",
+          "xargs: -I, -n, -P",
+          "Combined log-parsing pipelines"
+        ]
+      }
+    },
+    "M4": {
+      "topics": {
+        "basic": [
+          "init, clone, add, commit, status, log, diff",
+          "Branches & merge",
+          ".gitignore"
+        ],
+        "deep": [
+          "Merge vs rebase, conflict resolution",
+          "Undoing: reset, revert, reflog, stash",
+          "cherry-pick, bisect, tags, hooks",
+          "Remotes & GitHub workflows",
+          "Clean history & atomic commits"
+        ]
+      }
+    },
+    "M5": {
+      "topics": {
+        "basic": [
+          "Markdown basics",
+          "YAML indentation, lists, maps"
+        ],
+        "deep": [
+          "Anchors &, aliases *, merge keys <<",
+          "Multi-doc ---, quoting, gotchas",
+          "YAML in CI/CD, Compose, Ansible, K8s",
+          "Validating YAML programmatically"
+        ]
+      }
+    },
+    "M6": {
+      "topics": {
+        "basic": [
+          "OSI model, IP addressing, ports",
+          "Common services (22, 80, 443, 5432)"
+        ],
+        "deep": [
+          "CIDR & subnetting math",
+          "TCP vs UDP, handshake",
+          "DNS end-to-end: dig, records, TTL",
+          "HTTP deep: methods, status, TLS",
+          "Tools: curl -v, nc, ss, ip",
+          "Firewalls: ufw / iptables"
+        ]
+      }
+    },
+    "M7": {
+      "topics": {
+        "basic": [
+          "SSH keys vs passwords, ssh-keygen"
+        ],
+        "deep": [
+          "SSH config, ed25519, port forwarding",
+          "Authentication vs authorization",
+          "TLS: certificates, CAs, openssl s_client",
+          "Least privilege & sudo rules",
+          "Secrets mindset & secret managers",
+          "Auditing: auth.log, last, who"
+        ]
+      }
+    },
+    "M8": {
+      "topics": {
+        "basic": [
+          "Syntax: types, lists, dicts, loops, functions",
+          "Files with with blocks",
+          "pip, venv, requirements.txt"
+        ],
+        "deep": [
+          "JSON/YAML/CSV parsing",
+          "std lib: pathlib, subprocess, shutil, re",
+          "Automation patterns & error handling",
+          "CLI tools: argparse",
+          "HTTP: requests & APIs",
+          "pytest basics",
+          "Env vars & .env"
+        ]
+      }
+    },
+    "M9": {
+      "topics": {
+        "basic": [
+          "Why CI/CD",
+          "Workflow anatomy: on, jobs, steps",
+          "Simple build + test pipeline"
+        ],
+        "deep": [
+          "Triggers: push, PR, schedule, paths",
+          "Matrix builds",
+          "Caching & artifacts",
+          "Secrets & environments",
+          "Concurrency, needs, conditionals",
+          "Reusable workflows & self-hosted runners",
+          "Build → test → staging → prod"
+        ]
+      }
+    },
+    "M10": {
+      "topics": {
+        "basic": [
+          "Why config management",
+          "Inventory & ad-hoc commands",
+          "Playbooks: tasks, become, handlers"
+        ],
+        "deep": [
+          "Modules: apt, copy, template, service",
+          "Jinja2 templating",
+          "Variables, facts, precedence",
+          "Roles & directory structure",
+          "Idempotency",
+          "Vault for secrets"
+        ]
+      }
+    },
+    "M11": {
+      "topics": {
+        "basic": [
+          "Why IaC",
+          "HCL: resource, variable, output",
+          "init → plan → apply → destroy"
+        ],
+        "deep": [
+          "State & remote state locking",
+          "Modules & registry",
+          "Providers & tfvars",
+          "Workspaces",
+          "count vs for_each, lifecycle",
+          "Drift detection",
+          "Secrets & backends",
+          "Terraform vs Ansible vs CloudFormation"
+        ]
+      }
+    },
+    "M12": {
+      "topics": {
+        "basic": [
+          "Containers vs VMs",
+          "Architecture: daemon, CLI, registry",
+          "Core commands: build, run, ps, logs",
+          "Dockerfile: FROM, RUN, COPY, CMD",
+          "Ports, volumes, networks"
+        ],
+        "deep": [
+          "Image layers & caching",
+          "Multi-stage builds",
+          ".dockerignore & size hygiene",
+          "Non-root & distroless, scanning",
+          "Volumes vs bind mounts",
+          "Docker networking deep",
+          "Namespaces, cgroups, overlayfs",
+          "Healthchecks & restart policies"
+        ]
+      }
+    },
+    "M13": {
+      "topics": {
+        "basic": [
+          "docker-compose.yml: services, volumes, networks"
+        ],
+        "deep": [
+          "Multi-service apps & healthchecks",
+          "depends_on & startup ordering",
+          ".env & interpolation",
+          "Named volumes & backups",
+          "Profiles & resource limits",
+          "Dev/prod parity"
+        ]
+      }
+    },
+    "M14": {
+      "topics": {
+        "basic": [
+          "Declarative model, control plane vs nodes",
+          "Pods, Deployments, Services, Ingress",
+          "kubectl workflow",
+          "Labels & selectors"
+        ],
+        "deep": [
+          "Deployments: rolling updates, rollback",
+          "Probes: liveness, readiness, startup",
+          "Requests & limits, QoS",
+          "Service types & DNS",
+          "Ingress routing & TLS",
+          "PV/PVC & storage classes",
+          "Namespaces & quotas",
+          "RBAC: roles, bindings, SAs"
+        ]
+      }
+    },
+    "M15": {
+      "topics": {
+        "basic": [],
+        "deep": [
+          "Scheduling: affinity, taints, tolerations",
+          "Controllers & reconcile loop",
+          "CRDs & operators",
+          "Helm: charts, values, rollback",
+          "HPA / VPA autoscaling",
+          "Network policies",
+          "Service mesh: mTLS, canary",
+          "External Secrets Operator / Vault"
+        ]
+      }
+    },
+    "M16": {
+      "topics": {
+        "basic": [
+          "Regions, AZs, global vs regional",
+          "Core building blocks",
+          "Console vs CLI vs IaC"
+        ],
+        "deep": [
+          "AWS: IAM, VPC, EC2, S3, cost",
+          "Azure: subscriptions, Entra ID, VNet, VM",
+          "Identity & least privilege",
+          "VPC/VNet networking & NAT",
+          "Security groups & NSGs",
+          "Cost awareness & budgets"
+        ]
+      }
+    },
+    "M17": {
+      "topics": {
+        "basic": [
+          "Why observability",
+          "Prometheus & Grafana basics",
+          "Alert rules"
+        ],
+        "deep": [
+          "RED vs USE metrics",
+          "PromQL: rate, increase, histogram_quantile",
+          "Exporters & service discovery",
+          "Logging: Loki, structured logs",
+          "Tracing: OpenTelemetry",
+          "Alerting & avoiding fatigue",
+          "SLOs & burn rate"
+        ]
+      }
+    },
+    "M18": {
+      "topics": {
+        "basic": [
+          "Git as source of truth",
+          "ArgoCD: apps, sync, drift"
+        ],
+        "deep": [
+          "ArgoCD: projects, sync policies, self-heal",
+          "Helm + ArgoCD",
+          "Canary & blue-green (Argo Rollouts)",
+          "Rollback = git revert",
+          "Repo structure & overlays"
+        ]
+      }
+    },
+    "M19": {
+      "topics": {
+        "basic": [
+          "DevOps vs SRE",
+          "Toil & error budgets"
+        ],
+        "deep": [
+          "Reliability: capacity, redundancy, chaos",
+          "Incident response & postmortems",
+          "Backups & DR: RPO/RTO, tested restores",
+          "Security hardening in CI",
+          "Cost optimization",
+          "Load testing & performance"
+        ]
+      }
+    }
+  }
+}

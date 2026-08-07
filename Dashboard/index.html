@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DevOps Zero-to-Hero — Progress Dashboard</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --card: #171a21;
+    --card-2: #1e222b;
+    --border: #2a2f3a;
+    --text: #e6e9ef;
+    --muted: #8b93a3;
+    --accent: #4f8cff;
+    --done: #34d399;
+    --progress: #fbbf24;
+    --pending: #3a4150;
+    --level1: #4f8cff;
+    --level2: #34d399;
+    --level3: #fb923c;
+    --level4: #c084fc;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    padding: 32px 24px 64px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  h1 { font-size: 26px; letter-spacing: .3px; }
+  .subtitle { color: var(--muted); margin-top: 6px; font-size: 14px; }
+
+  /* ---------- Overall header ---------- */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-bottom: 28px;
+  }
+  .header-left { display: flex; align-items: center; gap: 20px; }
+  .ring-wrap { position: relative; width: 92px; height: 92px; flex-shrink: 0; }
+  .ring-wrap svg { transform: rotate(-90deg); }
+  .ring-text {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+  }
+  .ring-pct { font-size: 22px; font-weight: 700; }
+  .ring-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+  .stats { display: flex; gap: 20px; flex-wrap: wrap; }
+  .stat {
+    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+    padding: 12px 18px; text-align: center; min-width: 86px;
+  }
+  .stat .num { font-size: 24px; font-weight: 700; }
+  .stat .cap { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .6px; margin-top: 2px; }
+  .stat.done .num { color: var(--done); }
+  .stat.active .num { color: var(--progress); }
+  .stat.todo .num { color: var(--muted); }
+  .stat.streak { cursor: pointer; min-width: 110px; }
+  .stat.streak .num { color: var(--progress); }
+  .stat.streak .num .flame { font-size: 15px; }
+  .stat.streak.checked { border-color: rgba(52,211,153,.55); }
+  .stat.streak .today-badge {
+    display: inline-block; font-size: 10px; letter-spacing: .6px; text-transform: uppercase;
+    color: var(--muted); margin-top: 3px;
+  }
+  .stat.streak.checked .today-badge { color: var(--done); }
+  .stat.xp .num { color: var(--level4); }
+
+  /* ---------- Level cards ---------- */
+  .level {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+  .level-head {
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    padding: 16px 20px; border-bottom: 1px solid var(--border); flex-wrap: wrap;
+  }
+  .level-title { display: flex; align-items: center; gap: 12px; }
+  .level-badge {
+    width: 34px; height: 34px; border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 15px; color: #fff;
+  }
+  .level-name { font-size: 17px; font-weight: 600; }
+  .level-sub { font-size: 12px; color: var(--muted); margin-top: 1px; }
+  .level-meta { display: flex; align-items: center; gap: 14px; }
+  .bar-outer {
+    width: 220px; height: 10px; background: var(--pending); border-radius: 99px; overflow: hidden;
+  }
+  .bar-inner { height: 100%; border-radius: 99px; transition: width .4s ease; }
+  .level-pct { font-size: 14px; font-weight: 700; min-width: 40px; text-align: right; }
+
+  /* ---------- Module grid ---------- */
+  .modules { padding: 16px 20px 20px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; }
+  .mod {
+    background: var(--card-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    user-select: none;
+    transition: transform .12s ease, border-color .12s ease;
+    position: relative;
+  }
+  .mod:hover { transform: translateY(-2px); border-color: var(--accent); }
+  .mod-id {
+    font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+    color: var(--muted); display: flex; align-items: center; justify-content: space-between;
+  }
+  .mod-id-right { display: flex; align-items: center; gap: 8px; }
+  .mod-status-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--pending); }
+  .mod-status-btn {
+    background: none; border: none; cursor: pointer; padding: 2px 4px; border-radius: 5px;
+    font-size: 11px; color: var(--muted);
+  }
+  .mod-status-btn:hover { background: var(--card); color: var(--text); }
+  .mod-name { font-size: 14px; font-weight: 600; margin-top: 6px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .mod-desc { font-size: 12px; color: var(--muted); margin-top: 4px; line-height: 1.35; }
+  .mod-open {
+    font-size: 11px; color: var(--accent); cursor: pointer; white-space: nowrap;
+    font-weight: 600; letter-spacing: .4px;
+  }
+  .mod-open:hover { text-decoration: underline; }
+  .mod.check { border-left: 3px solid var(--pending); }
+  .mod.check .mod-name { font-size: 13px; font-style: italic; }
+  .mod.check .mod-open { font-style: normal; }
+  /* statuses */
+  .mod[data-status="done"] { border-color: rgba(52,211,153,.35); }
+  .mod[data-status="done"] .mod-status-dot { background: var(--done); }
+  .mod[data-status="done"] .mod-name { color: var(--done); }
+  .mod[data-status="inprogress"] { border-color: rgba(251,191,36,.45); }
+  .mod[data-status="inprogress"] .mod-status-dot { background: var(--progress); box-shadow: 0 0 8px var(--progress); }
+  .mod[data-status="inprogress"] .mod-name { color: var(--progress); }
+
+  /* ---------- Controls ---------- */
+  .controls { display: flex; gap: 10px; margin: 4px 0 24px; flex-wrap: wrap; }
+  button {
+    background: var(--card); color: var(--text); border: 1px solid var(--border);
+    padding: 8px 14px; border-radius: 9px; font-size: 13px; cursor: pointer; transition: all .15s;
+  }
+  button:hover { border-color: var(--accent); background: var(--card-2); }
+  .hint { color: var(--muted); font-size: 12px; margin-bottom: 16px; }
+  kbd {
+    background: var(--card-2); border: 1px solid var(--border); border-radius: 4px;
+    padding: 1px 6px; font-size: 11px; font-family: monospace;
+  }
+  .footer { color: var(--muted); font-size: 12px; margin-top: 24px; text-align: center; }
+
+  /* ---------- Module detail modal ---------- */
+  .modal-backdrop {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.62);
+    backdrop-filter: blur(3px);
+    z-index: 100;
+    align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .modal-backdrop.open { display: flex; }
+  .modal {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    width: 100%; max-width: 560px;
+    max-height: 86vh;
+    overflow-y: auto;
+    padding: 22px 24px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.5);
+  }
+  .modal-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; margin-bottom: 4px; }
+  .modal-title { font-size: 19px; font-weight: 700; }
+  .modal-sub { font-size: 12px; color: var(--muted); margin-top: 3px; }
+  .modal-close {
+    background: none; border: none; color: var(--muted); font-size: 20px; cursor: pointer;
+    line-height: 1; padding: 4px 8px; border-radius: 8px;
+  }
+  .modal-close:hover { color: var(--text); background: var(--card-2); }
+  .modal-status { display: flex; gap: 8px; margin: 14px 0; flex-wrap: wrap; align-items: center; }
+  .modal-status .stat-pill {
+    padding: 6px 12px; border-radius: 99px; font-size: 12px; font-weight: 600; cursor: pointer;
+    border: 1px solid var(--border); color: var(--muted); transition: all .15s;
+  }
+  .modal-status .stat-pill:hover { border-color: var(--accent); }
+  .modal-status .stat-pill.active-pending { background: var(--pending); color: var(--text); border-color: transparent; }
+  .modal-status .stat-pill.active-progress { background: var(--progress); color: #000; border-color: transparent; }
+  .modal-status .stat-pill.active-done { background: var(--done); color: #000; border-color: transparent; }
+  .modal-topics-progress { font-size: 12px; color: var(--muted); margin-left: auto; }
+  .topic-section { margin-top: 6px; }
+  .topic-section h4 {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted);
+    margin: 12px 0 6px; display: flex; align-items: center; gap: 8px;
+  }
+  .topic-section h4::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .topic {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 10px; border-radius: 8px; cursor: pointer;
+    font-size: 13px; color: var(--text);
+  }
+  .topic:hover { background: var(--card-2); }
+  .topic input[type="checkbox"] { accent-color: var(--done); width: 15px; height: 15px; cursor: pointer; }
+  .topic.done .topic-label { text-decoration: line-through; color: var(--muted); }
+  .modal-foot { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
+  .modal-foot .spacer { flex: 1; }
+  .mod-topics {
+    font-size: 11px; color: var(--muted); margin-top: 6px;
+    display: flex; justify-content: space-between; gap: 8px;
+  }
+  .mod-topics .tp-bar { flex: 1; max-width: 90px; height: 4px; background: var(--pending); border-radius: 99px; overflow: hidden; align-self: center; }
+  .mod-topics .tp-bar i { display: block; height: 100%; background: var(--done); border-radius: 99px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="ring-wrap">
+      <svg width="92" height="92" viewBox="0 0 92 92">
+        <circle cx="46" cy="46" r="40" fill="none" stroke="#2a2f3a" stroke-width="9"/>
+        <circle id="overallArc" cx="46" cy="46" r="40" fill="none"
+                stroke="url(#grad)" stroke-width="9" stroke-linecap="round"
+                stroke-dasharray="251.3" stroke-dashoffset="251.3"/>
+        <defs>
+          <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#4f8cff"/>
+            <stop offset="100%" stop-color="#34d399"/>
+          </linearGradient>
+        </defs>
+      </svg>
+      <div class="ring-text">
+        <span class="ring-pct" id="overallPct">0%</span>
+        <span class="ring-label">Complete</span>
+      </div>
+    </div>
+    <div>
+      <h1>DevOps Zero-to-Hero</h1>
+      <div class="subtitle">Interactive progress dashboard · 19 modules + 4 capstones</div>
+    </div>
+  </div>
+  <div class="stats">
+    <div class="stat streak" id="statStreak" onclick="toggleToday()" title="Did you learn today? Click to check today in — don't break the chain.">
+      <div class="num" id="streakNum">0<span class="flame">🔥</span></div>
+      <div class="cap">Day streak · best <span id="streakBest">0</span></div>
+      <div class="today-badge" id="todayBadge">today ✗</div>
+    </div>
+    <div class="stat xp"><div class="num" id="xpNum">0</div><div class="cap">XP</div></div>
+    <div class="stat done"><div class="num" id="statDone">0</div><div class="cap">Done</div></div>
+    <div class="stat active"><div class="num" id="statActive">0</div><div class="cap">In progress</div></div>
+    <div class="stat todo"><div class="num" id="statTodo">0</div><div class="cap">Pending</div></div>
+  </div>
+</div>
+
+<div class="controls">
+  <button onclick="cycleAll('inprogress')">Advance one module</button>
+  <button onclick="resetProgress()">Reset progress</button>
+  <button onclick="copyJSON()">Export data (JSON)</button>
+  <button onclick="importJSON()">Import data</button>
+  <input type="file" id="fileInput" accept="application/json" style="display:none" onchange="handleFile(event)">
+</div>
+<div class="hint">Click a module card to see its <b>pending topic list</b>. Use <kbd>chat ↗</kbd> to launch that module's opencode chat (requires the web UI running — see <kbd>start-web.sh</kbd>), <kbd>○</kbd> to cycle status, and tick topics off in the detail panel. Click the <b>🔥 Day streak</b> card after every study session to check today in — don't break the chain. <b>XP</b>: basic topic 10 · deep topic 20 · module done 50 · capstone 100. Changes save in your browser; the tutor also syncs <kbd>progress.json</kbd>.</div>
+
+<div id="levels"></div>
+
+<div class="modal-backdrop" id="modal">
+  <div class="modal" id="modalBox">
+    <div class="modal-head">
+      <div>
+        <div class="modal-title" id="modalTitle"></div>
+        <div class="modal-sub" id="modalSub"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-status" id="modalStatus"></div>
+    <div id="modalBody"></div>
+    <div class="modal-foot">
+      <button onclick="openCurrentSession()">Launch chat ↗</button>
+      <button onclick="openCurrentNotes()">Notes (Obsidian)</button>
+      <div class="spacer"></div>
+      <button onclick="closeModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="footer">Dashboard data is stored in your browser (localStorage). The JSON data block inside this file holds the default values.</div>
+
+<script id="progress-data" type="application/json">
+{
+  "modules": [
+    {
+      "id": "M1",
+      "name": "Linux",
+      "level": 1,
+      "desc": "Filesystem, perms, processes, systemd",
+      "session": "M1-Linux",
+      "status": "done",
+      "checkpoint": true,
+      "topics": {
+        "basic": [
+          "Filesystem hierarchy & navigation",
+          "File permissions (chmod/chown)",
+          "Users, groups, sudo",
+          "Pipes, redirects, grep"
+        ],
+        "deep": [
+          "Special perms: sticky bit & setuid",
+          "Processes: ps, top, kill, signals",
+          "System health: df, du, free, uname",
+          "systemd: systemctl, journalctl, .service files",
+          "/proc & /sys virtual filesystems",
+          "Package mgmt (apt) + boot sequence"
+        ]
+      }
+    },
+    {
+      "id": "M2",
+      "name": "Bash Scripting",
+      "level": 1,
+      "desc": "Robust scripts, traps, getopts",
+      "session": "M2-Bash-Scripting",
+      "status": "pending",
+      "checkpoint": true,
+      "topics": {
+        "basic": [
+          "Variables, args, conditionals, loops",
+          "Exit codes, && / ||",
+          "Shebang & executable scripts"
+        ],
+        "deep": [
+          "set -euo pipefail & error handling",
+          "trap for cleanup",
+          "Arrays, maps, string manipulation",
+          "Job control: &, jobs, fg, bg, wait",
+          "Advanced expansion & substitution",
+          "Functions & sourcing",
+          "getopts for flags",
+          "read loops & IFS"
+        ]
+      }
+    },
+    {
+      "id": "M3",
+      "name": "Text Power Tools",
+      "level": 1,
+      "desc": "grep, sed, awk, xargs, regex",
+      "session": "M3-Text-Tools",
+      "status": "pending",
+      "checkpoint": true,
+      "topics": {
+        "basic": [
+          "grep, sed, cut, sort, uniq, wc"
+        ],
+        "deep": [
+          "Regex: anchors, groups, greedy vs lazy",
+          "sed scripting: ranges, in-place",
+          "awk: fields, patterns, BEGIN/END",
+          "xargs: -I, -n, -P",
+          "Combined log-parsing pipelines"
+        ]
+      }
+    },
+    {
+      "id": "M4",
+      "name": "Git & GitHub",
+      "level": 1,
+      "desc": "Rebase, reflog, bisect, hooks",
+      "session": "M4-Git",
+      "status": "pending",
+      "checkpoint": true,
+      "topics": {
+        "basic": [
+          "init, clone, add, commit, status, log, diff",
+          "Branches & merge",
+          ".gitignore"
+        ],
+        "deep": [
+          "Merge vs rebase, conflict resolution",
+          "Undoing: reset, revert, reflog, stash",
+          "cherry-pick, bisect, tags, hooks",
+          "Remotes & GitHub workflows",
+          "Clean history & atomic commits"
+        ]
+      }
+    },
+    {
+      "id": "M5",
+      "name": "Markdown & YAML",
+      "level": 1,
+      "desc": "Anchors, merge keys, validation",
+      "session": "M5-YAML",
+      "status": "pending",
+      "checkpoint": true,
+      "topics": {
+        "basic": [
+          "Markdown basics",
+          "YAML indentation, lists, maps"
+        ],
+        "deep": [
+          "Anchors &, aliases *, merge keys <<",
+          "Multi-doc ---, quoting, gotchas",
+          "YAML in CI/CD, Compose, Ansible, K8s",
+          "Validating YAML programmatically"
+        ]
+      }
+    },
+    {
+      "id": "M6",
+      "name": "Networking",
+      "level": 1,
+      "desc": "CIDR, TCP, DNS, HTTP, firewalls",
+      "session": "M6-Networking",
+      "status": "pending",
+      "checkpoint": true,
+      "topics": {
+        "basic": [
+          "OSI model, IP addressing, ports",
+          "Common services (22, 80, 443, 5432)"
+        ],
+        "deep": [
+          "CIDR & subnetting math",
+          "TCP vs UDP, handshake",
+          "DNS end-to-end: dig, records, TTL",
+          "HTTP deep: methods, status, TLS",
+          "Tools: curl -v, nc, ss, ip",
+          "Firewalls: ufw / iptables"
+        ]
+      }
+    },
+    {
+      "id": "M7",
+      "name": "Security Essentials",
+      "level": 1,
+      "desc": "SSH, TLS, least privilege",
+      "session": "M7-Security",
+      "status": "pending",
+      "checkpoint": true,
+      "topics": {
+        "basic": [
+          "SSH keys vs passwords, ssh-keygen"
+        ],
+        "deep": [
+          "SSH config, ed25519, port forwarding",
+          "Authentication vs authorization",
+          "TLS: certificates, CAs, openssl s_client",
+          "Least privilege & sudo rules",
+          "Secrets mindset & secret managers",
+          "Auditing: auth.log, last, who"
+        ]
+      }
+    },
+    {
+      "id": "M8",
+      "name": "Python for DevOps",
+      "level": 2,
+      "desc": "Parsing, subprocess, argparse, pytest",
+      "session": "M8-Python",
+      "status": "pending",
+      "checkpoint": true,
+      "topics": {
+        "basic": [
+          "Syntax: types, lists, dicts, loops, functions",
+          "Files with with blocks",
+          "pip, venv, requirements.txt"
+        ],
+        "deep": [
+          "JSON/YAML/CSV parsing",
+          "std lib: pathlib, subprocess, shutil, re",
+          "Automation patterns & error handling",
+          "CLI tools: argparse",
+          "HTTP: requests & APIs",
+          "pytest basics",
+          "Env vars & .env"
+        ]
+      }
+    },
+    {
+      "id": "M9",
+      "name": "CI/CD (GitHub Actions)",
+      "level": 2,
+      "desc": "Matrices, caching, secrets, deploy",
+      "session": "M9-CICD",
+      "status": "pending",
+      "checkpoint": true,
+      "topics": {
+        "basic": [
+          "Why CI/CD",
+          "Workflow anatomy: on, jobs, steps",
+          "Simple build + test pipeline"
+        ],
+        "deep": [
+          "Triggers: push, PR, schedule, paths",
+          "Matrix builds",
+          "Caching & artifacts",
+          "Secrets & environments",
+          "Concurrency, needs, conditionals",
+          "Reusable workflows & self-hosted runners",
+          "Build → test → staging → prod"
+        ]
+      }
+    },
+    {
+      "id": "M10",
+      "name": "Ansible",
+      "level": 2,
+      "desc": "Roles, Jinja2, Vault, idempotency",
+      "session": "M10-Ansible",
+      "status": "pending",
+      "checkpoint": true,
+      "topics": {
+        "basic": [
+          "Why config management",
+          "Inventory & ad-hoc commands",
+          "Playbooks: tasks, become, handlers"
+        ],
+        "deep": [
+          "Modules: apt, copy, template, service",
+          "Jinja2 templating",
+          "Variables, facts, precedence",
+          "Roles & directory structure",
+          "Idempotency",
+          "Vault for secrets"
+        ]
+      }
+    },
+    {
+      "id": "M11",
+      "name": "Terraform",
+      "level": 2,
+      "desc": "State, modules, drift, lifecycle",
+      "session": "M11-Terraform",
+      "status": "pending",
+      "checkpoint": true,
+      "topics": {
+        "basic": [
+          "Why IaC",
+          "HCL: resource, variable, output",
+          "init → plan → apply → destroy"
+        ],
+        "deep": [
+          "State & remote state locking",
+          "Modules & registry",
+          "Providers & tfvars",
+          "Workspaces",
+          "count vs for_each, lifecycle",
+          "Drift detection",
+          "Secrets & backends",
+          "Terraform vs Ansible vs CloudFormation"
+        ]
+      }
+    },
+    {
+      "id": "M12",
+      "name": "Docker Deep",
+      "level": 3,
+      "desc": "Layers, multi-stage, networks, security",
+      "session": "M12-Docker",
+      "status": "pending",
+      "checkpoint": true,
+      "topics": {
+        "basic": [
+          "Containers vs VMs",
+          "Architecture: daemon, CLI, registry",
+          "Core commands: build, run, ps, logs",
+          "Dockerfile: FROM, RUN, COPY, CMD",
+          "Ports, volumes, networks"
+        ],
+        "deep": [
+          "Image layers & caching",
+          "Multi-stage builds",
+          ".dockerignore & size hygiene",
+          "Non-root & distroless, scanning",
+          "Volumes vs bind mounts",
+          "Docker networking deep",
+          "Namespaces, cgroups, overlayfs",
+          "Healthchecks & restart policies"
+        ]
+      }
+    },
+    {
+      "id": "M13",
+      "name": "Docker Compose",
+      "level": 3,
+      "desc": "Healthchecks, .env, volumes",
+      "session": "M13-Compose",
+      "status": "pending",
+      "checkpoint": true,
+      "topics": {
+        "basic": [
+          "docker-compose.yml: services, volumes, networks"
+        ],
+        "deep": [
+          "Multi-service apps & healthchecks",
+          "depends_on & startup ordering",
+          ".env & interpolation",
+          "Named volumes & backups",
+          "Profiles & resource limits",
+          "Dev/prod parity"
+        ]
+      }
+    },
+    {
+      "id": "M14",
+      "name": "Kubernetes Fundamentals",
+      "level": 3,
+      "desc": "Pods, services, probes, RBAC",
+      "session": "M14-K8s",
+      "status": "pending",
+      "checkpoint": true,
+      "topics": {
+        "basic": [
+          "Declarative model, control plane vs nodes",
+          "Pods, Deployments, Services, Ingress",
+          "kubectl workflow",
+          "Labels & selectors"
+        ],
+        "deep": [
+          "Deployments: rolling updates, rollback",
+          "Probes: liveness, readiness, startup",
+          "Requests & limits, QoS",
+          "Service types & DNS",
+          "Ingress routing & TLS",
+          "PV/PVC & storage classes",
+          "Namespaces & quotas",
+          "RBAC: roles, bindings, SAs"
+        ]
+      }
+    },
+    {
+      "id": "M15",
+      "name": "Kubernetes Advanced",
+      "level": 3,
+      "desc": "Helm, operators, HPA, network policies",
+      "session": "M15-K8s-Advanced",
+      "status": "pending",
+      "checkpoint": true,
+      "topics": {
+        "basic": [],
+        "deep": [
+          "Scheduling: affinity, taints, tolerations",
+          "Controllers & reconcile loop",
+          "CRDs & operators",
+          "Helm: charts, values, rollback",
+          "HPA / VPA autoscaling",
+          "Network policies",
+          "Service mesh: mTLS, canary",
+          "External Secrets Operator / Vault"
+        ]
+      }
+    },
+    {
+      "id": "M16",
+      "name": "Cloud (AWS + Azure)",
+      "level": 4,
+      "desc": "IAM, VPC/VNet, cost, identity",
+      "session": "M16-Cloud",
+      "status": "pending",
+      "checkpoint": true,
+      "topics": {
+        "basic": [
+          "Regions, AZs, global vs regional",
+          "Core building blocks",
+          "Console vs CLI vs IaC"
+        ],
+        "deep": [
+          "AWS: IAM, VPC, EC2, S3, cost",
+          "Azure: subscriptions, Entra ID, VNet, VM",
+          "Identity & least privilege",
+          "VPC/VNet networking & NAT",
+          "Security groups & NSGs",
+          "Cost awareness & budgets"
+        ]
+      }
+    },
+    {
+      "id": "M17",
+      "name": "Observability",
+      "level": 4,
+      "desc": "Prometheus, Loki, OpenTelemetry, SLOs",
+      "session": "M17-Observability",
+      "status": "pending",
+      "checkpoint": true,
+      "topics": {
+        "basic": [
+          "Why observability",
+          "Prometheus & Grafana basics",
+          "Alert rules"
+        ],
+        "deep": [
+          "RED vs USE metrics",
+          "PromQL: rate, increase, histogram_quantile",
+          "Exporters & service discovery",
+          "Logging: Loki, structured logs",
+          "Tracing: OpenTelemetry",
+          "Alerting & avoiding fatigue",
+          "SLOs & burn rate"
+        ]
+      }
+    },
+    {
+      "id": "M18",
+      "name": "GitOps & Progressive Delivery",
+      "level": 4,
+      "desc": "ArgoCD, canary, rollback=revert",
+      "session": "M18-GitOps",
+      "status": "pending",
+      "checkpoint": true,
+      "topics": {
+        "basic": [
+          "Git as source of truth",
+          "ArgoCD: apps, sync, drift"
+        ],
+        "deep": [
+          "ArgoCD: projects, sync policies, self-heal",
+          "Helm + ArgoCD",
+          "Canary & blue-green (Argo Rollouts)",
+          "Rollback = git revert",
+          "Repo structure & overlays"
+        ]
+      }
+    },
+    {
+      "id": "M19",
+      "name": "SRE & Hardening",
+      "level": 4,
+      "desc": "Incidents, backups, chaos, cost",
+      "session": "M19-SRE",
+      "status": "pending",
+      "checkpoint": true,
+      "topics": {
+        "basic": [
+          "DevOps vs SRE",
+          "Toil & error budgets"
+        ],
+        "deep": [
+          "Reliability: capacity, redundancy, chaos",
+          "Incident response & postmortems",
+          "Backups & DR: RPO/RTO, tested restores",
+          "Security hardening in CI",
+          "Cost optimization",
+          "Load testing & performance"
+        ]
+      }
+    }
+  ],
+  "capstones": [
+    {
+      "id": "L1",
+      "name": "Level 1 Capstone",
+      "desc": "Script + git + logs + network + SSH",
+      "status": "pending"
+    },
+    {
+      "id": "L2",
+      "name": "Level 2 Capstone",
+      "desc": "Pipeline → Ansible server, Terraform infra",
+      "status": "pending"
+    },
+    {
+      "id": "L3",
+      "name": "Level 3 Capstone",
+      "desc": "Helm + autoscaling + network policies",
+      "status": "pending"
+    },
+    {
+      "id": "L4",
+      "name": "Level 4 Capstone (Hero)",
+      "desc": "Full production portfolio project",
+      "status": "pending"
+    }
+  ],
+  "levels": [
+    {
+      "num": 1,
+      "name": "Foundations",
+      "sub": "Linux · Bash · Git · YAML · Networking · Security",
+      "color": "#4f8cff"
+    },
+    {
+      "num": 2,
+      "name": "Automation",
+      "sub": "Python · CI/CD · Ansible · Terraform",
+      "color": "#34d399"
+    },
+    {
+      "num": 3,
+      "name": "Containers & Kubernetes",
+      "sub": "Docker · Compose · Kubernetes",
+      "color": "#fb923c"
+    },
+    {
+      "num": 4,
+      "name": "Cloud & Production",
+      "sub": "Cloud · Observability · GitOps · SRE",
+      "color": "#c084fc"
+    }
+  ],
+  "topicsDone": {
+    "M1": [
+      "M1-b0",
+      "M1-b1",
+      "M1-b2",
+      "M1-b3",
+      "M1-d0",
+      "M1-d1",
+      "M1-d2"
+    ]
+  }
+}
+</script>
+
+<script>
+(function () {
+  const LS_KEY = 'devops-progress-v1';
+  const STREAK_KEY = 'devops-streak-v1';
+  const DATA = JSON.parse(document.getElementById('progress-data').textContent);
+  let topicDone = {};   // { "M1": ["M1-b0","M1-d1"], ... }
+  let modalModule = null;
+  let sessionMap = { baseUrl: 'http://127.0.0.1:4096', modules: {}, master: null };
+  let habit = { days: [] }; // ISO dates you studied ("2026-08-07", ...)
+  try { const h = JSON.parse(localStorage.getItem(STREAK_KEY)); if (h && Array.isArray(h.days)) habit = h; } catch (e) { /* corrupt -> fresh */ }
+
+  function localIso(d) {
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+  function todayStr() { return localIso(new Date()); }
+  function prevDayStr(iso) {
+    const d = new Date(iso + 'T00:00:00');
+    d.setDate(d.getDate() - 1);
+    return localIso(d);
+  }
+  function streakNow() {
+    const set = new Set(habit.days);
+    if (!set.size) return 0;
+    let cur = 0;
+    let d = new Date();
+    if (!set.has(todayStr())) d.setDate(d.getDate() - 1);
+    while (set.has(localIso(d))) { cur++; d.setDate(d.getDate() - 1); }
+    return cur;
+  }
+  function bestStreak() {
+    const days = Array.from(new Set(habit.days)).sort();
+    let best = 0, run = 0, prev = null;
+    for (const day of days) {
+      run = (prev && prev === prevDayStr(day)) ? run + 1 : 1;
+      best = Math.max(best, run);
+      prev = day;
+    }
+    return best;
+  }
+  function saveHabit() { localStorage.setItem(STREAK_KEY, JSON.stringify(habit)); }
+  window.toggleToday = function () {
+    const t = todayStr();
+    const set = new Set(habit.days);
+    if (set.has(t)) set.delete(t); else set.add(t);
+    habit.days = Array.from(set);
+    saveHabit();
+    render();
+  };
+  function renderHabit() {
+    const today = new Set(habit.days).has(todayStr());
+    document.getElementById('statStreak').classList.toggle('checked', today);
+    document.getElementById('streakNum').innerHTML = streakNow() + '<span class="flame">🔥</span>';
+    document.getElementById('streakBest').textContent = bestStreak();
+    document.getElementById('todayBadge').textContent = today ? 'today ✓' : 'today ✗';
+  }
+  function sectionCounts(m) {
+    const set = new Set(topicDone[m.id] || []);
+    let basic = 0, deep = 0;
+    moduleTopics(m).forEach(t => { if (set.has(t.id)) { if (t.section === 'basic') basic++; else deep++; } });
+    return { basic, deep };
+  }
+  function xpTotal() {
+    let xp = 0;
+    DATA.modules.forEach(m => {
+      const s = sectionCounts(m);
+      xp += s.basic * 10 + s.deep * 20;
+      if (m.status === 'done') xp += 50;
+    });
+    DATA.capstones.forEach(c => { if (c.status === 'done') xp += 100; });
+    return xp;
+  }
+
+  function topicId(mid, section, i) { return mid + '-' + (section === 'basic' ? 'b' : 'd') + i; }
+  function moduleTopics(m) {
+    const t = [];
+    (m.topics.basic || []).forEach((x, i) => t.push({ id: topicId(m.id, 'basic', i), label: x, section: 'basic' }));
+    (m.topics.deep || []).forEach((x, i) => t.push({ id: topicId(m.id, 'deep', i), label: x, section: 'deep' }));
+    return t;
+  }
+  function moduleDoneCount(m) {
+    const set = topicDone[m.id] || [];
+    return moduleTopics(m).filter(t => set.includes(t.id)).length;
+  }
+
+  function load() {
+    if (DATA.topicsDone) {
+      Object.entries(DATA.topicsDone).forEach(([mid, ids]) => { topicDone[mid] = Array.from(ids); });
+    }
+    try {
+      const saved = JSON.parse(localStorage.getItem(LS_KEY));
+      if (saved && saved.topics) {
+        Object.entries(saved.topics).forEach(([mid, ids]) => {
+          if (!Array.isArray(ids) || !ids.length) return;
+          const base = topicDone[mid] || [];
+          topicDone[mid] = Array.from(new Set([...base, ...ids]));
+        });
+      }
+    } catch (e) { /* corrupt -> keep */ }
+    fetch('topics.json')
+      .then(r => { if (!r.ok) throw 0; return r.json(); })
+      .then(tj => {
+        if (tj && tj.modules) {
+          DATA.modules.forEach(m => {
+            const t = tj.modules[m.id];
+            if (t && t.topics && (t.topics.basic || t.topics.deep)) m.topics = t.topics;
+          });
+        }
+      })
+      .catch(() => {})
+      .then(() => fetch('sessions.json'))
+      .then(r => { if (!r.ok) throw 0; return r.json(); })
+      .then(s => { sessionMap = s; })
+      .catch(() => {})
+      .finally(() => {
+        fetch('progress.json')
+          .then(r => { if (!r.ok) throw 0; return r.json(); })
+          .then(fileData => {
+            DATA.modules.forEach(m => { if (fileData.modules && fileData.modules[m.id]) m.status = fileData.modules[m.id]; });
+            DATA.capstones.forEach(c => { if (fileData.capstones && fileData.capstones[c.id]) c.status = fileData.capstones[c.id]; });
+            if (fileData.topics) {
+              Object.entries(fileData.topics).forEach(([mid, ids]) => {
+                if (!Array.isArray(ids) || !ids.length) return;
+                const base = topicDone[mid] || [];
+                topicDone[mid] = Array.from(new Set([...base, ...ids]));
+              });
+            }
+            applyLocal();
+            render();
+          })
+          .catch(() => { applyLocal(); render(); });
+      });
+  }
+  function applyLocal() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(LS_KEY));
+      if (saved) {
+        DATA.modules.forEach(m => { m.status = (saved.modules[m.id] || m.status); });
+        DATA.capstones.forEach(c => { c.status = (saved.capstones[c.id] || c.status); });
+      }
+    } catch (e) { /* corrupt data -> keep */ }
+  }
+  function save() {
+    const payload = {
+      modules: Object.fromEntries(DATA.modules.map(m => [m.id, m.status])),
+      capstones: Object.fromEntries(DATA.capstones.map(c => [c.id, c.status])),
+      topics: topicDone
+    };
+    localStorage.setItem(LS_KEY, JSON.stringify(payload));
+  }
+  function statusScore(s) { return s === 'done' ? 1 : s === 'inprogress' ? 0.5 : 0; }
+
+  function topicCounts(m) {
+    const total = moduleTopics(m).length;
+    const done = moduleDoneCount(m);
+    return { total, done };
+  }
+
+  function render() {
+    // stats
+    const all = [...DATA.modules, ...DATA.capstones];
+    const done = all.filter(m => m.status === 'done').length;
+    const active = all.filter(m => m.status === 'inprogress').length;
+    const pending = all.filter(m => m.status === 'pending').length;
+    const pct = Math.round((done / all.length) * 100);
+    document.getElementById('statDone').textContent = done;
+    document.getElementById('statActive').textContent = active;
+    document.getElementById('statTodo').textContent = pending;
+    document.getElementById('xpNum').textContent = xpTotal();
+    renderHabit();
+    document.getElementById('overallPct').textContent = pct + '%';
+    const circ = 251.3; // 2*pi*40
+    document.getElementById('overallArc').style.strokeDashoffset = circ - (circ * pct / 100);
+
+    // levels
+    const levelsEl = document.getElementById('levels');
+    levelsEl.innerHTML = '';
+    DATA.levels.forEach(level => {
+      const mods = DATA.modules.filter(m => m.level === level.num);
+      const caps = DATA.capstones.filter(c => c.id === 'L' + level.num);
+      const items = [...mods, ...caps];
+      const score = items.reduce((s, m) => s + statusScore(m.status), 0);
+      const lPct = Math.round((score / items.length) * 100);
+
+      const card = document.createElement('div');
+      card.className = 'level';
+      card.innerHTML = `
+        <div class="level-head">
+          <div class="level-title">
+            <div class="level-badge" style="background:${level.color}">${level.num}</div>
+            <div>
+              <div class="level-name">Level ${level.num} — ${level.name}</div>
+              <div class="level-sub">${level.sub}</div>
+            </div>
+          </div>
+          <div class="level-meta">
+            <div class="bar-outer"><div class="bar-inner" style="width:${lPct}%;background:${level.color}"></div></div>
+            <div class="level-pct">${lPct}%</div>
+          </div>
+        </div>
+        <div class="modules"><div class="grid"></div></div>`;
+
+      const grid = card.querySelector('.grid');
+      mods.forEach(m => grid.appendChild(moduleCard(m, level.color)));
+      caps.forEach(c => grid.appendChild(capCard(c)));
+      levelsEl.appendChild(card);
+    });
+    save();
+  }
+
+  function openSession(m) {
+    const base = (sessionMap && sessionMap.baseUrl) || 'http://127.0.0.1:4096';
+    const id = sessionMap && sessionMap.modules && sessionMap.modules[m.id];
+    if (id) {
+      window.open(base + '/session/' + id, '_blank');
+    } else {
+      window.open(base + '/new-session', '_blank');
+    }
+  }
+  function openNotes(m) {
+    const base = new URL('../Sessions/', window.location.href);
+    const path = new URL(m.session + '.md', base).pathname;
+    location.href = 'obsidian://open?path=' + encodeURIComponent(path);
+  }
+
+  function moduleCard(m, color) {
+    const el = document.createElement('div');
+    el.className = 'mod';
+    el.dataset.status = m.status;
+    const tc = topicCounts(m);
+    el.innerHTML = `
+      <div class="mod-id">L${m.level}-${m.id}
+        <span class="mod-id-right">
+          <span class="mod-status-btn" title="Cycle status (pending → in progress → done)">○</span>
+          <span class="mod-status-dot"></span>
+        </span>
+      </div>
+      <div class="mod-name">${m.name} <span class="mod-open" title="Launch this module's opencode chat session">chat ↗</span></div>
+      <div class="mod-desc">${m.desc}</div>
+      <div class="mod-topics" title="Topics done / total">
+        <span>${tc.done}/${tc.total} topics</span>
+        <span class="tp-bar"><i style="width:${tc.total ? (tc.done / tc.total * 100) : 0}%"></i></span>
+      </div>`;
+    el.addEventListener('click', () => openModal(m));
+    el.querySelector('.mod-status-btn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      m.status = m.status === 'pending' ? 'inprogress' : m.status === 'inprogress' ? 'done' : 'pending';
+      el.dataset.status = m.status;
+      render();
+    });
+    el.querySelector('.mod-open').addEventListener('click', (e) => {
+      e.stopPropagation();
+      openSession(m);
+    });
+    return el;
+  }
+  function capCard(c) {
+    const el = document.createElement('div');
+    el.className = 'mod check';
+    el.dataset.status = c.status;
+    el.innerHTML = `
+      <div class="mod-id">${c.name}
+        <span class="mod-id-right">
+          <span class="mod-status-btn" title="Cycle status (pending → in progress → done)">○</span>
+          <span class="mod-status-dot"></span>
+        </span>
+      </div>
+      <div class="mod-desc">${c.desc}</div>`;
+    el.querySelector('.mod-status-btn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      c.status = c.status === 'pending' ? 'inprogress' : c.status === 'inprogress' ? 'done' : 'pending';
+      el.dataset.status = c.status;
+      render();
+    });
+    return el;
+  }
+
+  // ---- module detail modal ----
+  window.openModal = function (m) {
+    modalModule = m;
+    renderModal();
+    document.getElementById('modal').classList.add('open');
+  };
+  window.closeModal = function () {
+    document.getElementById('modal').classList.remove('open');
+    modalModule = null;
+  };
+  window.openCurrentSession = function () {
+    if (modalModule) openSession(modalModule);
+  };
+  window.openCurrentNotes = function () {
+    if (modalModule) openNotes(modalModule);
+  };
+  window.setModuleStatus = function (status) {
+    if (!modalModule) return;
+    modalModule.status = status;
+    render();
+    renderModal();
+  };
+  window.toggleTopic = function (id) {
+    const m = modalModule;
+    if (!m) return;
+    let set = topicDone[m.id] || [];
+    set = set.includes(id) ? set.filter(x => x !== id) : [...set, id];
+    topicDone[m.id] = set;
+    save();
+    render();
+    renderModal();
+  };
+
+  function renderModal() {
+    const m = modalModule;
+    if (!m) return;
+    const lvl = DATA.levels.find(l => l.num === m.level);
+    const tc = topicCounts(m);
+    document.getElementById('modalTitle').textContent = `L${m.level}-${m.id} — ${m.name}`;
+    document.getElementById('modalSub').textContent = (lvl ? lvl.name + ' · ' : '') + m.desc;
+
+    const statusMap = { pending: 'Pending', inprogress: 'In progress', done: 'Done' };
+    const pillCls = { pending: 'active-pending', inprogress: 'active-progress', done: 'active-done' };
+    document.getElementById('modalStatus').innerHTML = `
+      <span class="stat-pill ${m.status === 'pending' ? pillCls.pending : ''}" onclick="setModuleStatus('pending')">○ Pending</span>
+      <span class="stat-pill ${m.status === 'inprogress' ? pillCls.inprogress : ''}" onclick="setModuleStatus('inprogress')">◐ In progress</span>
+      <span class="stat-pill ${m.status === 'done' ? pillCls.done : ''}" onclick="setModuleStatus('done')">● Done</span>
+      <span class="modal-topics-progress">${tc.done}/${tc.total} topics done</span>`;
+
+    const set = topicDone[m.id] || [];
+    const body = document.getElementById('modalBody');
+    body.innerHTML = '';
+    const sections = [['basic', 'Basic'], ['deep', 'Deep']];
+    sections.forEach(([key, label]) => {
+      const topics = (m.topics[key] || []);
+      if (!topics.length) return;
+      const sec = document.createElement('div');
+      sec.className = 'topic-section';
+      sec.innerHTML = `<h4>${label}</h4>`;
+      topics.forEach((t, i) => {
+        const id = topicId(m.id, key, i);
+        const done = set.includes(id);
+        const row = document.createElement('div');
+        row.className = 'topic' + (done ? ' done' : '');
+        row.innerHTML = `<input type="checkbox" ${done ? 'checked' : ''} onchange="toggleTopic('${id}')"><span class="topic-label">${t}</span>`;
+        sec.appendChild(row);
+      });
+      body.appendChild(sec);
+    });
+  }
+
+  // ---- controls ----
+  window.cycleAll = function () {
+    const order = ['pending', 'inprogress', 'done'];
+    let started = false;
+    for (const m of [...DATA.modules, ...DATA.capstones]) {
+      if (!started && m.status !== 'done') { started = true; m.status = 'inprogress'; break; }
+    }
+    render();
+  };
+  window.resetProgress = function () {
+    if (confirm('Reset ALL progress to default (M1 done, rest pending)?')) {
+      localStorage.removeItem(LS_KEY);
+      location.reload();
+    }
+  };
+  window.copyJSON = async function () {
+    await navigator.clipboard.writeText(JSON.stringify({
+      modules: Object.fromEntries(DATA.modules.map(m => [m.id, m.status])),
+      capstones: Object.fromEntries(DATA.capstones.map(c => [c.id, c.status])),
+      topics: topicDone
+    }, null, 2));
+    alert('Progress JSON (incl. topics) copied to clipboard.');
+  };
+  window.importJSON = function () { document.getElementById('fileInput').click(); };
+  window.handleFile = function (event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const data = JSON.parse(reader.result);
+        DATA.modules.forEach(m => { if (data.modules[m.id]) m.status = data.modules[m.id]; });
+        DATA.capstones.forEach(c => { if (data.capstones[c.id]) c.status = data.capstones[c.id]; });
+        if (data.topics) topicDone = data.topics;
+        render();
+      } catch (e) { alert('Invalid JSON file.'); }
+    };
+    reader.readAsText(file);
+    event.target.value = '';
+  };
+
+  document.getElementById('modal').addEventListener('click', (e) => {
+    if (e.target.id === 'modal') closeModal();
+  });
+
+  load();
+  render();
+})();
+</script>
+</body>
+</html>
