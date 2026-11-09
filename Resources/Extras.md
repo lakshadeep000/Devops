@@ -10,9 +10,26 @@ Bonus resources beyond the per-level sheets: the big community-curated collectio
 
 ## 🌟 The Mega-Collection (bregman-arie/devops-resources)
 
-[**devops-resources**](https://github.com/bregman-arie/devops-resources) — 9.6k⭐. Curated resources per topic (Linux, Git, Bash, Python, Ansible, Terraform, Kubernetes, Networking, Security, AWS, Azure, Containers, Prometheus...), plus roadmaps, tools, blogs, and interview questions.
+[**devops-resources**](https://github.com/bregman-arie/devops-resources) — 9.7k⭐ *(verified live 2026-08-22)*. Curated resources per topic (Linux, Git, Bash, Python, Ansible, Terraform, Kubernetes, Networking, Security, AWS, Azure, Containers, Prometheus...), plus roadmaps, tools, blogs, and interview questions.
 
 Use it as your **"dig deeper" index** — when a module's official docs feel thin, check its section here.
+
+**Per-topic deep links → module map** (each is a curated page of books/courses/videos):
+
+| Topic page | Feeds module |
+|---|---|
+| [`resources/linux.md`](https://github.com/bregman-arie/devops-resources/blob/master/resources/linux.md) | M1 (incl. logging extension) |
+| [`resources/bash.md`](https://github.com/bregman-arie/devops-resources/blob/master/resources/bash.md) | M2 |
+| [`resources/git.md`](https://github.com/bregman-arie/devops-resources/blob/master/resources/git.md) | M4 |
+| [`resources/network.md`](https://github.com/bregman-arie/devops-resources/blob/master/resources/network.md) | M6 |
+| [`resources/security.md`](https://github.com/bregman-arie/devops-resources/blob/master/resources/security.md) | M7 |
+| [`resources/python.md`](https://github.com/bregman-arie/devops-resources/blob/master/resources/python.md) | M8 |
+| [`resources/ansible.md`](https://github.com/bregman-arie/devops-resources/blob/master/resources/ansible.md) | M10 |
+| [`resources/kubernetes.md`](https://github.com/bregman-arie/devops-resources/blob/master/resources/kubernetes.md), [`containers.md`](https://github.com/bregman-arie/devops-resources/blob/master/resources/containers.md) | M12–M15 |
+| [`resources/prometheus.md`](https://github.com/bregman-arie/devops-resources/blob/master/resources/prometheus.md), [`elk.md`](https://github.com/bregman-arie/devops-resources/blob/master/resources/elk.md), [`victoriametrics.md`](https://github.com/bregman-arie/devops-resources/blob/master/resources/victoriametrics.md) | M17 Observability (native logging → industry stack bridge) |
+| [`resources/aws.md`](https://github.com/bregman-arie/devops-resources/blob/master/resources/aws.md), [`azure.md`](https://github.com/bregman-arie/devops-resources/blob/master/resources/azure.md) | M16 comparative study |
+
+Also useful from its toolchain section for **M17 context**: log-management landscape (Logstash/Graylog/Fluentd/Splunk, Loki aggregation) — shows where native `journald`/`rsyslog` skills plug into production stacks.
 
 ---
 
@@ -35,6 +52,15 @@ Use it as your **"dig deeper" index** — when a module's official docs feel thi
 | *The DevOps Handbook* | The practical companion to Phoenix |
 | [Google SRE books](https://sre.google/books/) | The theory + practice bible (free) |
 | [The 12-Factor App](https://12factor.net) | How to write deployable apps — must-read |
+
+## 🗄️ Databases (optional / cross-cutting)
+
+Not a module on its own, but databases show up in every stack — backups, RDS vs Azure SQL, migration.
+
+| Resource | Use it for |
+|----------|-----------|
+| 📕 *MySQL Notes for Professionals* — [[MySQLNotesForProfessionals.pdf]] | Backup/restore (`mysqldump`), indexing, replication — used in the M19 RPO/RTO lab |
+| 📖 [PostgreSQL docs](https://www.postgresql.org/docs/) | The other major open-source DB; same backup concepts apply |
 
 ## 🔎 SRE & Design Extras
 

@@ -218,6 +218,74 @@ source-type: session-notes
 
 ---
 
+## systemd — Services (the recipe)
+
+| Command | Description |
+|---------|-------------|
+| `systemctl status NAME` | Live state, PID, cgroup tree, recent logs |
+| `systemctl cat NAME` | Show the unit file (`systemctl cat docker`) |
+| `systemctl start/stop/restart NAME` | Lifecycle control |
+| `systemctl enable --now NAME` | Start now **and** auto-start at boot |
+| `systemctl disable NAME` | Remove auto-start (stop separately) |
+| `systemctl daemon-reload` | ⚠️ Always run after editing a unit file |
+| `systemctl list-units --type=service --state=running` | Running services |
+| `systemctl show -p MainPID --value NAME` | Just the main PID |
+| `systemctl reset-failed NAME` | Clear `failed` state after fixing a crash-loop |
+| `journalctl -u NAME` | All logs for that unit |
+| `journalctl -u NAME -f` | Follow logs live |
+| `journalctl -n 20` | Last N log lines |
+| `journalctl -b -1` | Logs from the previous boot |
+
+**Unit file anatomy** (three sections):
+- `[Unit]` — identity + ordering: `Description`, `After=` (order), `Wants=` (soft dep), `Requires=` (hard dep)
+- `[Service]` — execution: `ExecStart`, `ExecReload`, `Restart=on-failure/always` (self-healing), `RestartSec=`, `TimeoutStartSec`, `Type=simple` (started when forked) vs `Type=notify` (waits for READY=1), `User=`
+- `[Install]` — scheduling: `WantedBy=multi-user.target` (enabled = symlink into `.wants/`)
+
+**Crash-loop governor:** `StartLimitBurst` (default 5) within `StartLimitIntervalSec` (default 10s) → unit goes `failed` and stops retrying. Set to `0` to disable.
+
+---
+
+## Virtual Filesystems (`/proc`, `/sys`) & Inodes
+
+| Command | Description |
+|---------|-------------|
+| `/proc/<pid>/` | Per-process dossier (status, cmdline, fd/, maps, environ, limits, oom_score) |
+| `/proc/self` | Your current process |
+| `/proc/meminfo`, `/proc/loadavg`, `/proc/uptime`, `/proc/cmdline` | System stats / boot args |
+| `ls -l /proc/PID/fd` | Open file descriptors — **0=stdin, 1=stdout, 2=stderr**, then one number per open file/socket |
+| `cat /proc/PID/status` | State, PPid, Uid, VmRSS, Threads |
+| `findmnt` | The whole mount tree (real fs vs `proc`/`sys`/`cgroup2`) |
+| `df -i` | **Inode** usage — "how many files fit", separate from space |
+| `ls -i file` | The file's inode number (its permanent ID) |
+| `stat file` | Inode + `Links` (hard-link count) + device `major:minor` |
+| `ln a b` | Hard link: a second name → **same inode**. Blocked across owners (`fs.protected_hardlinks`) |
+
+**Mental model:** a file = *inode* (metadata + data pointers) + one or more *names*. `/proc` & `/sys` are kernel memory exposed as files — that's how monitoring tools read stats.
+**Inode trap:** "No space left on device" with free space = **inodes exhausted** (millions of tiny files). Diagnose with `df -i`.
+
+---
+
+## Boot Sequence & Package Management (`apt`)
+
+**Boot:** `UEFI → GRUB → kernel + initramfs → systemd (PID 1) → default.target → services`
+- `cat /proc/cmdline` — kernel boot args: `root=UUID=…` (stable disk ID, not `/dev/sdX`), `ro` (read-only until fs check), `quiet splash`
+- `systemd-analyze` / `systemd-analyze blame` — boot time per phase / slowest units
+- Targets = modern runlevels: `graphical.target` requires `multi-user.target` (servers) → `basic.target` → `sysinit.target`
+
+| Command | Description |
+|---------|-------------|
+| `apt update` | Refresh package index (what's *available*) |
+| `apt upgrade` | Apply available upgrades |
+| `apt install pkg` / `apt remove pkg` | Install / remove |
+| `apt list --installed` / `--upgradable` | Installed / updateable packages |
+| `apt-cache policy pkg` | Installed vs **Candidate** version + which repo (the `***` marks installed) |
+| `dpkg -l` | Low-level package DB; `ii` = installed & healthy (`apt` is the dependency-solving front-end to `dpkg`) |
+| `apt-get autoremove` | Clean orphaned dependencies |
+
+**Repos live in** `/etc/apt/sources.list(.d)`: Ubuntu (`noble`, `noble-updates`, `noble-security`, `noble-backports`) + third-party (docker-ce, chrome, code). Same software can come from multiple repos (e.g. `docker-ce` vs Ubuntu's `docker.io`) — check `apt-cache policy` before trusting versions.
+
+---
+
 ## Quick Reference (TL;DR)
 ```
 pwd            where am I?
@@ -247,10 +315,20 @@ jobs / fg / bg job control
 nice -n 10     lower priority
 free -h        RAM (trust available)
 df -h          disk free
+df -i          inode usage
 du -sh dir     dir size
 uptime         load average
 uname -a       kernel info
 nproc          core count
+systemctl status NAME   service state
+systemctl enable --now  boot + start
+systemctl daemon-reload after editing units
+journalctl -u NAME -f   live service logs
+cat /proc/loadavg       system stats
+ls -l /proc/PID/fd      open files/sockets
+apt update && apt upgrade  patch box
+apt-cache policy pkg    version + repo source
+dpkg -l                 package DB
 | > >> &&      pipes, redirects, chains
 man cmd        the manual
 ```

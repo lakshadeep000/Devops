@@ -3,7 +3,7 @@ module: M16
 level: 4
 name: Cloud (AWS + Azure)
 status: pending
-last-updated: 2026-08-06
+last-updated: 2026-08-07
 ---
 
 # 🗂️ Session — L4-M16 Cloud (AWS + Azure)
@@ -13,6 +13,9 @@ last-updated: 2026-08-06
 > [!info] Handoff
 > Status: **pending** · Level 4 — Cloud & Production
 
+> [!important] Design decision (set 2026-08-07)
+> This module is a **comparative AWS ⇄ Azure study** — learn every concept on AWS, then map it to the Azure equivalent ("X in AWS ≈ Y in Azure"). Student already holds AWS associate certs → AWS topics get a quick review, Azure gets the deep dive. Target depth: AWS DevOps Engineer Pro (DOP-C02) + Azure DevOps Engineer (AZ-400) level.
+
 ## ✅ Covered So Far
 - (nothing yet)
 
@@ -20,10 +23,11 @@ last-updated: 2026-08-06
 - (not started)
 
 ## 🎯 Agenda for Next Session
-- (tutor fills in at first session)
+- Start with the **translation table** (see module plan): build the AWS→Azure service map together, topic by topic — identity, networking, compute, storage, security, serverless, K8s, CI/CD, cost
+- Pair-labs: build the same workload on both clouds (identity first, then networking)
 
 ## 🧪 Checkpoint (pass to mark module done)
-- (set at first session)
+- From memory: the full AWS⇄Azure translation table + same least-privilege principal & private-subnet network built on both clouds via IaC/CLI
 
 ## ❓ Open Questions
 - (log anything unclear here)

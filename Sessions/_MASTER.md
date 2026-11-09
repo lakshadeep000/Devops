@@ -11,8 +11,8 @@ last-updated: 2026-08-06
 
 | Module | Status | Session file |
 |--------|--------|--------------|
-| **L1-M1** Linux | 🔶 in progress | [[Sessions/M1-Linux]] |
-| **L1-M2** Bash Scripting | ⬜ pending | [[Sessions/M2-Bash]] |
+| **L1-M1** Linux | ✅ done | [[Sessions/M1-Linux]] |
+| **L1-M2** Bash Scripting | ⬜ pending | [[Sessions/M2-Bash-Scripting]] |
 | **L1-M3** Text Power Tools | ⬜ pending | [[Sessions/M3-Text-Tools]] |
 | **L1-M4** Git & GitHub | ⬜ pending | [[Sessions/M4-Git]] |
 | **L1-M5** Markdown & YAML | ⬜ pending | [[Sessions/M5-YAML]] |
@@ -47,7 +47,16 @@ last-updated: 2026-08-06
 
 ## 📝 Master Session Log
 
+### 2026-11-09
+- **Course content updated to use all available resources**: created missing `Resources/Cross-Platform-Logging-Monitoring.md` atlas (BSD/Solaris/AIX/HP-UX logging matrix — feeds M1 d7 cross-platform topic); wired local Packt clone chapters into plans (Bash Cookbook Chapter02 `backup.sh` → M2 checkpoint skeleton; Python-for-DevOps `logging/` folder → M8 logging practice); updated all GitHub URLs verified live (54/54). M1 remains reopened for logging/monitoring extension (d6–d8, U1–U5 gated curriculum). Dashboard + assessments regenerated via sync.js.
+
+### 2026-08-12
+- **M1 (Linux) module COMPLETE**: systemd (units, restart policies, crash-loop governor, self-healing mydemo service, journalctl), `/proc` & `/sys` + file descriptors, mount points & inodes (hard links, `df -i`), boot sequence, `apt`. 4/4 checkpoints passed. Cheatsheet expanded (systemd, virtual fs, boot, apt). Day-04 note written. Status → done.
+
 ### 2026-08-07
+- **Resources watchdog rule added to `AGENTS.md`**: every session now starts by checking `Resources/` + `git status` for new materials and wiring them into the level sheets, plan 📚 lines, and (only if topics change) `topics.json` + `sync.js`.
+- **Wired in 2 new PDFs the student added**: `GitNotesForProfessionals.pdf` → M4 (plan + Level-1 sheet); `MySQLNotesForProfessionals.pdf` → new "Databases (optional)" section in `Resources/Extras.md` + M19 backup/restore lab reference. Also found + wired **DevOps Shack 250 Linux Scenario Q&A PDF** → M1 checkpoint drill (plan + Level-1 sheet).
+- **M16 redesigned as a comparative AWS ⇄ Azure study**: every topic is now "X in AWS ≈ Y in Azure" (identity IAM↔Entra ID, VPC↔VNet, EC2↔VM, Lambda↔Functions, EKS↔AKS, CodePipeline↔Azure DevOps, SG↔NSG, Cost Explorer↔Cost Management). Student holds AWS associate certs → AWS = review, Azure = deep dive; target depth DOP-C02 + AZ-400. Topics synced via `topics.json` + `sync.js` (4 basic / 9 deep); plan, Level-4 resources, and M16 session file updated.
 - **Cloned 3 Packt repos locally** into `Resources/Packt/` for offline labs: Linux Shell Scripting Cookbook (464K), The Ultimate Linux Bootcamp (16M), Python for DevOps (12M). Documented in `Resources/Packt-DevOps.md` + `AGENTS.md`.
 - **Packt companion-code repos mapped to every module** in `Resources/Packt-DevOps.md` (curated from the PacktPublishing GitHub org: Bash cookbook 246⭐, CompTIA Security+ 464⭐, Terraform Cookbook, K8s Enterprise Guide, ArgoCD-in-Practice, Prometheus/Observability, Rockstar SRE, etc.) — used as example farms during labs. Linked from all 4 `Resources/Level-*.md` sheets + every `Plan/01–04` module's 📚 Resources line.
 - **Local PDFs now wired into the training material**: `TLCL-25.12A.pdf` + `LinuxNotesForProfessionals.pdf` → M1, `BashNotesForProfessionals.pdf` → M2, `PythonNotesForProfessionals.pdf` → M8. Referenced in the level sheets, plan Resources lines, and `AGENTS.md` (tutor cites them in labs).

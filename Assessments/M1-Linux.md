@@ -3,7 +3,7 @@ module: M1
 name: Linux
 level: 1
 status: not-started
-last-updated: 2026-08-06
+last-updated: 2026-11-09
 ---
 
 # 📋 Pre-training Questionnaire — M1 Linux
@@ -37,6 +37,9 @@ For each topic mark one cell with an **X**:
 | systemd: systemctl, journalctl, .service files | | | | |
 | /proc & /sys virtual filesystems | | | | |
 | Package mgmt (apt) + boot sequence | | | | |
+| System logging: event flow (kmsg→journald→rsyslog), journald, rsyslog filters, logrotate, auditd, psacct/acct, logger/systemd-cat injection | | | | |
+| Cross-platform logging: BSD syslog/newsyslog, Solaris SMF/logadm, AIX errpt/alog | | | | |
+| System monitoring: sar/sysstat, atop, vmstat/iostat, thresholds & health scripts | | | | |
 
 ## Short answers
 1. **What's your goal with this module?** (job need / a specific project / curiosity)

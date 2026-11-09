@@ -3,7 +3,7 @@ module: M15
 name: Kubernetes Advanced
 level: 3
 status: not-started
-last-updated: 2026-08-06
+last-updated: 2026-11-09
 ---
 
 # 📋 Pre-training Questionnaire — M15 Kubernetes Advanced

@@ -9,34 +9,44 @@
 
 ---
 
-## M16 — Cloud Fundamentals (AWS + Azure)
+## M16 — Cloud Fundamentals (AWS ⇄ Azure, comparative)
 
-### Basic
-- What "the cloud" actually is: regions, availability zones, global vs regional resources
-- Core building blocks: compute, storage, networking, identity — in both AWS and Azure
-- The console vs CLI vs IaC (spoiler: you'll use IaC, but you need to *see* the console once)
+> [!note] Approach: learn both clouds as one subject
+> You already hold AWS associate certs, so this module is built as a **side-by-side comparison**: for every concept, learn the AWS way, then map it to the Azure equivalent. The pattern to internalize is *"X in AWS ≈ Y in Azure"* — that's what makes the second cloud fast to learn and the porting table you'll use on the job. Target depth: **AWS DevOps Engineer Pro (DOP-C02)** + **Azure DevOps Engineer (AZ-400)** level.
 
-### Deep
-- **AWS**: accounts, IAM (users/roles/policies), VPC (subnets, route tables, security groups, NAT), EC2, S3, billing/cost explorer
-- **Azure**: subscriptions/resource groups, Entra ID, VNet, VM, Blob Storage, cost management
-- **Identity is everything**: understand IAM/Entra deeply — least privilege, policies, managed identity
-- **VPC/VNet networking**: public vs private subnets, NACLs vs security groups (AWS), NSGs (Azure)
-- **Cost awareness**: tags, budgets, right-sizing, and why infra as code helps costs
+### Basic (comparison frame)
+- **Regions, AZs & global structure**: AWS Regions/AZs/edge vs Azure Regions/Availability Zones; global vs regional services
+- **Accounts & org**: AWS accounts/organizations vs Azure tenants, subscriptions, resource groups
+- **Console, CLI & IaC**: AWS Console + `aws` CLI + CloudFormation vs Azure Portal + `az` CLI + Bicep/ARM
+- **Core building blocks side-by-side**: compute, storage, networking, identity — the two vocabularies
+
+### Deep (side-by-side per domain)
+- **Identity**: AWS IAM (users, roles, policies, managed identity) vs Azure Entra ID (RBAC, managed identities, service principals)
+- **Networking**: AWS VPC (subnets, route tables, NAT, peering, security groups, NACLs) vs Azure VNet (subnets, NSGs, NAT gateway, VNet peering, DNS zones)
+- **Compute**: EC2 + ASG vs Azure VMs + VMSS; instance types vs VM sizes; spot vs spot/preemptible
+- **Storage**: S3/EBS/EFS vs Blob Storage/Managed Disks/Files; lifecycle, tiers, backup
+- **Security**: Security Groups vs NSGs; WAF both sides; secrets (Secrets Manager vs Key Vault); IAM policies vs RBAC definitions
+- **Serverless**: Lambda vs Azure Functions (triggers, cold start, quotas)
+- **K8s bridge**: EKS vs AKS (maps back to M14/15 — cluster ops on both)
+- **CI/CD bridge**: CodePipeline/CodeBuild vs Azure DevOps Pipelines (maps to M9/M18)
+- **Cost & governance**: Cost Explorer/budgets vs Cost Management; tags vs tags + resource groups; right-sizing
 
 ### 🛡️ Production-grade focus
-- **Day-2 reality**: cloud is *someone else's computer with an invoice*. Identity misconfig is the #1 cause of real breaches, and un-tagged resources are how bills explode.
-- **Failure modes to know**: over-permissive IAM policy (read/write to everything); public subnets for things that should be private; no NAT so private instances can't patch; untagged resources → surprise bill; a leaked key (rotate + audit); single-AZ deployment = one datacenter outage kills you.
-- **Ops checklist**: IAM least privilege + test the *deny*; VPC/VNet with private subnets + NAT; tag and budget *everything*; enable account root MFA; keep access via roles/identity federation, not long-lived keys; plan for multi-AZ from day one; use IaC so infra is reviewable.
-- **Resources**: [[Resources/Level-4-Cloud-Production|Level 4 resources]] → AWS Well-Architected (must-read pillars); *AWS in Action*; Microsoft Learn paths; Skill Builder sandboxes. 🐙 [Effective DevOps with AWS](https://github.com/PacktPublishing/Effective-DevOps-with-AWS).
+- **Day-2 reality**: you'll hold certs in one cloud and get hired to operate the other. The comparison table is the actual job skill — most incidents are "AWS team misconfigures Azure" or vice versa.
+- **Failure modes to know**: over-permissive IAM policy *or* Entra RBAC role; public subnets where private is needed; no NAT → private instances can't patch; untagged resources → surprise bill on both clouds; a leaked key/credential (rotate + audit); single-AZ on either side = one datacenter outage.
+- **Ops checklist**: learn the same workload in *both* clouds — build once per provider; IAM/RBAC least privilege on both; VPC/VNet private subnets + NAT on both; tag + budget on both; root/tenant MFA; use IaC so infra is reviewable; keep the mental "AWS ≈ Azure" table updated as you go.
+- **Resources**: [[Resources/Level-4-Cloud-Production|Level 4 resources]] → AWS Well-Architected + [Azure Well-Architected](https://learn.microsoft.com/en-us/azure/well-architected/); [Microsoft's official AWS-to-Azure service map](https://learn.microsoft.com/en-us/azure/architecture/aws-professional/); *AWS in Action*; Microsoft Learn paths; Skill Builder + Azure free account. 🐙 [Effective DevOps with AWS](https://github.com/PacktPublishing/Effective-DevOps-with-AWS).
 
-### 🛠️ Lab ideas
-- Create a VPC/VNet with public+private subnets and route traffic through a NAT
-- Create an IAM user with only the permissions needed for one task; test denial
-- Put a tag/budget on everything you create; check the cost view
-- Use CLI to create + destroy resources (learn by paying pennies, not dollars)
+### 🛠️ Lab ideas (build the SAME workload on both)
+- **Pair-lab 1 — Identity**: create a least-privilege principal on both (IAM user/role vs Entra service principal); test the deny on each
+- **Pair-lab 2 — Networking**: build a VPC *and* a VNet with public+private subnets + NAT; compare the console journeys
+- **Pair-lab 3 — Compute**: launch an EC2 vs an Azure VM, expose it, scale (ASG vs VMSS)
+- **Pair-lab 4 — Serverless**: same Lambda function vs Azure Function triggered the same way
+- **K8s bridge**: deploy the same deployment to EKS *and* AKS (reuses your M14/15 manifests)
+- Tag/budget everything on both; compare the cost views
 
 ### 🎯 Checkpoint
-Design and create (via IaC or CLI): a VPC with public/private subnets, an IAM role with least privilege, and a cost budget — and explain region/AZ/global scoping from memory.
+From memory, build a **translation table**: for each of identity, networking, compute, storage, security, serverless, K8s, CI/CD, and cost — the AWS service, the Azure equivalent, and one key difference each. Then create the same least-privilege principal + private-subnet network on *both* clouds via IaC/CLI.
 
 ---
 
@@ -121,7 +131,7 @@ Deploy your Level 3 Helm chart to a cluster via ArgoCD from a Git repo (self-hea
 - **Day-2 reality**: SRE is the discipline that *owns reliability on purpose*. Production readiness is: it fails, you know fast, it recovers, and it's tested.
 - **Failure modes to know**: a backup that was never restored (backup ≠ backup); no RPO/RTO documented; single points of failure unexercised; postmortems that blame people (nothing gets fixed); capacity surprises during load; costs creeping with no owner.
 - **Ops checklist**: *tested* restore with documented RPO/RTO; deliberate failure drills (chaos): kill a node/container and watch recovery; blameless postmortem for a real outage you caused; load test to find the real bottleneck; one cost win that doesn't hurt reliability; alert on error budget burn, not just symptoms.
-- **Resources**: [[Resources/Level-4-Cloud-Production|Level 4 resources]] → *Site Reliability Engineering* + *The SRE Workbook* (free from Google); *Building Secure & Reliable Systems*; chaosengineering.org + Chaos Monkey docs. 🐙 [Becoming a Rockstar SRE](https://github.com/PacktPublishing/Becoming-a-Rockstar-SRE) + [Real-World SRE](https://github.com/PacktPublishing/Real-World-SRE).
+- **Resources**: [[Resources/Level-4-Cloud-Production|Level 4 resources]] → *Site Reliability Engineering* + *The SRE Workbook* (free from Google); *Building Secure & Reliable Systems*; chaosengineering.org + Chaos Monkey docs. 🐙 [Becoming a Rockstar SRE](https://github.com/PacktPublishing/Becoming-a-Rockstar-SRE) + [Real-World SRE](https://github.com/PacktPublishing/Real-World-SRE). 📕 [[MySQLNotesForProfessionals.pdf]] for the backup/restore lab (classic RPO/RTO drill).
 
 ### 🛠️ Lab ideas
 - Kill a node/container in your cluster on purpose → watch the system recover

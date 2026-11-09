@@ -10,15 +10,17 @@ Curated PDFs, videos, and docs for **Level 4 — Cloud, Observability & Producti
 
 ---
 
-## M16 — Cloud Fundamentals (AWS + Azure)
+## M16 — Cloud Fundamentals (AWS + Azure, comparative)
 
 | Type | Resource |
 |------|----------|
-| 📖 Docs | [AWS docs](https://docs.aws.amazon.com) · [AWS Whitepapers](https://aws.amazon.com/whitepapers/) — *Well-Architected* is a must-read |
-| 🎥 Video | *AWS Certified Cloud Practitioner / Solutions Architect* full courses — freeCodeCamp |
-| 📖 Docs | [Azure docs](https://learn.microsoft.com/en-us/azure/) · [Microsoft Learn](https://learn.microsoft.com/en-us/training/) — free learning paths |
-| 🎯 Practice | [AWS Skill Builder](https://skillbuilder.aws) — free sandboxes · [Azure free account](https://azure.microsoft.com/free) |
-| 📕 Book | *AWS in Action* (Wittig) — PDF, hands-on EC2/VPC/S3 |
+| 📖 Docs | [Microsoft's official AWS→Azure service mapping](https://learn.microsoft.com/en-us/azure/architecture/aws-professional/) — **your translation table**, bookmark it |
+| 📖 Docs | [AWS Well-Architected](https://docs.aws.amazon.com/wellarchitected/latest/framework/welcome.html) + [Azure Well-Architected](https://learn.microsoft.com/en-us/azure/well-architected/) — read the same pillar on both sides |
+| 🎥 Video | *AWS Solutions Architect / DevOps* full courses — freeCodeCamp (you already hold AWS certs, skim) |
+| 📖 Docs | [Microsoft Learn](https://learn.microsoft.com/en-us/training/) — free Azure paths; AZ-104 admin + AZ-400 DevOps paths are the Azure depth you need |
+| 🎯 Practice | [AWS Skill Builder](https://skillbuilder.aws) sandboxes · [Azure free account](https://azure.microsoft.com/free) + [Azure sandboxes](https://learn.microsoft.com/en-us/training/modules/design-azure-fundamentals) |
+| 📕 Book | *AWS in Action* (Wittig) — AWS depth · Microsoft's [Cloud Adoption Framework](https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/) — Azure operating model |
+| 🐙 Packt | [Effective DevOps with AWS](https://github.com/PacktPublishing/Effective-DevOps-with-AWS) — AWS-centric examples to mirror on Azure |
 
 ## M17 — Observability
 

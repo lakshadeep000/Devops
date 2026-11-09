@@ -3,7 +3,7 @@ module: M16
 name: Cloud (AWS + Azure)
 level: 4
 status: not-started
-last-updated: 2026-08-06
+last-updated: 2026-11-09
 ---
 
 # 📋 Pre-training Questionnaire — M16 Cloud (AWS + Azure)
@@ -23,19 +23,23 @@ For each topic mark one cell with an **X**:
 ### Basic
 | Topic | 🔴 Never | 🟠 Heard | 🟡 Basic | 🟢 Confident |
 |-------|----------|----------|----------|--------------|
-| Regions, AZs, global vs regional | | | | |
-| Core building blocks | | | | |
-| Console vs CLI vs IaC | | | | |
+| Regions, AZs & global structure: AWS vs Azure | | | | |
+| Accounts & org: AWS accounts vs Azure tenants/subscriptions | | | | |
+| Console, CLI & IaC: AWS CLI vs Azure CLI | | | | |
+| Core building blocks side-by-side (compute/storage/net/identity) | | | | |
 
 ### Deep
 | Topic | 🔴 Never | 🟠 Heard | 🟡 Basic | 🟢 Confident |
 |-------|----------|----------|----------|--------------|
-| AWS: IAM, VPC, EC2, S3, cost | | | | |
-| Azure: subscriptions, Entra ID, VNet, VM | | | | |
-| Identity & least privilege | | | | |
-| VPC/VNet networking & NAT | | | | |
-| Security groups & NSGs | | | | |
-| Cost awareness & budgets | | | | |
+| Identity: IAM vs Entra ID (roles, RBAC, managed identity) | | | | |
+| Networking: VPC vs VNet (subnets, NAT, peering, DNS) | | | | |
+| Compute: EC2 vs Azure VM + scaling (ASG vs VMSS) | | | | |
+| Storage: S3/EBS vs Blob/Managed Disks | | | | |
+| Security: Security Groups/NACLs vs NSGs + secrets | | | | |
+| Serverless: Lambda vs Azure Functions | | | | |
+| K8s bridge: EKS vs AKS (ties to M14/15) | | | | |
+| CI/CD bridge: CodePipeline vs Azure DevOps (ties to M9/M18) | | | | |
+| Cost & governance: budgets, tags, resource groups | | | | |
 
 ## Short answers
 1. **What's your goal with this module?** (job need / a specific project / curiosity)

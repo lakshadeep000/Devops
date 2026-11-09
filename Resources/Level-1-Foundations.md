@@ -14,11 +14,13 @@ Curated PDFs, videos, and docs for **Level 1 — Foundations**. Read/watch along
 
 | Type          | Resource                                                                                                                                                                      |
 | ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 📕 PDF (book) | [*The Linux Command Line*](http://linuxcommand.org/tlcl.php) — William Shotts. Free, the classic. Chapters 1–11 cover filesystem, permissions, processes. [[TLCL-25.12A.pdf]] |
-| 📕 PDF | *Linux Notes for Professionals* — [[LinuxNotesForProfessionals.pdf]], Stack-Overflow-curated command reference (searchable, great when you forget a flag) |
+| 📕 PDF (book) | [*The Linux Command Line*](http://linuxcommand.org/tlcl.php) — William Shotts. Free, the classic. Chapters 1–11 cover filesystem, permissions, processes. **Logging-extension pages: ch10 p154 (process-tools incl. vmstat), ch15 p225–226 (`journalctl -f` + `/var/log/syslog` tail tips)**. [[TLCL-25.12A.pdf]] |
+| 📕 PDF | *Linux Notes for Professionals* — [[LinuxNotesForProfessionals.pdf]], Stack-Overflow-curated command reference (searchable, great when you forget a flag). **Logging-extension pages: p27 (vmstat/iostat/dstat examples), p37 (`journalctl -xe/-f/-t sshd`, `-p err -S yesterday`, auditd log path) — p37 is the Tier-1 challenge pattern** |
+| 📕 PDF (Q&A) | *DevOps Shack — 250 Linux Scenario Based Q&A* — [[DevOps Shack _ 250 Linux Scenario Based Q and A (1).pdf]] — scenario drill for the checkpoint (the M1 session quiz came from this style of question). **Log-ops scenarios for U2/U4: auth.log brute-force greps, custom-app logrotate stanza, log archival/truncation** |
 | 🎥 Video      | NetworkChuck — *Linux for Hackers / Beginners* playlist (YouTube). Fast-paced, hands-on. https://www.youtube.com/watch?v=VbEx7B_PTOE&list=PLIhvC56v63IJIujb5cyE13oLuyORZpdkL  |
 | 🎥 Video      | *Linux Journey* — https://linuxjourney.com (interactive text + quiz, great for gaps)                                                                                          |
 | 📖 Docs       | `man <command>` for everything; [Ubuntu docs](https://help.ubuntu.com)                                                                                                        |
+| 🐙 GitHub     | [bregman-arie/devops-resources → `resources/linux.md`](https://github.com/bregman-arie/devops-resources/blob/master/resources/linux.md) — curated Linux books/courses/videos index (dig-deeper list) |
 | 🎧 Audio      | Late Night Linux podcast — stay current                                                                                                                                       |
 ![[Pasted image 20260808030930.png]]
 ## M2 — Bash Scripting
@@ -45,6 +47,7 @@ Curated PDFs, videos, and docs for **Level 1 — Foundations**. Read/watch along
 | Type | Resource |
 |------|----------|
 | 📕 PDF (book) | [*Pro Git*](https://git-scm.com/book/en/v2) — free, official, reads like a novel. Chapters 3 (branching), 7 (rebase/reset) are essential. |
+| 📕 PDF | *Git Notes for Professionals* — [[GitNotesForProfessionals.pdf]], Stack-Overflow-curated Git reference (searchable) |
 | 🎥 Video | *Git & GitHub Full Course* — freeCodeCamp (YouTube) |
 | 📖 Docs | https://git-scm.com/doc · [GitHub docs](https://docs.github.com) |
 | 🎯 Practice | https://learngitbranching.js.org — interactive, the best Git trainer |

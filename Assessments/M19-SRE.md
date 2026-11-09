@@ -3,7 +3,7 @@ module: M19
 name: SRE & Hardening
 level: 4
 status: not-started
-last-updated: 2026-08-06
+last-updated: 2026-11-09
 ---
 
 # 📋 Pre-training Questionnaire — M19 SRE & Hardening

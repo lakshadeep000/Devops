@@ -41,6 +41,16 @@ When a module is starting for the **first time** (its session file has nothing c
 - `Resources/Packt-DevOps.md` — curated Packt companion-code repos mapped to every module; point the student there as **example farms** (clone shallow, read the chapter folder, re-implement in their own `Scripts/`/`Labs/`).
 - `Resources/Packt/` — local shallow clones you can open directly in labs: `Linux-Shell-Scripting-Cookbook-Third-Edition/` (Ch2 backup.sh → M2 checkpoint), `The-Ultimate-Linux-Bootcamp-for-DevOps-SRE-and-Cloud-Engineers/` (M1 quiz), `Python-for-DevOps-The-Ultimate-Hands-On-Guide/` (M8).
 
+## Resources watchdog (run at session start)
+Every session (Master or module), **before teaching anything**, check for newly-added study material and wire it in:
+1. List `Resources/` for new/unknown files (PDFs, Packt clones, notes) and run `git status` for untracked files anywhere in the vault (the student regularly drops files in).
+2. For each new item, map it to the relevant module(s) and integrate it:
+   - Add a row to that module's section in `Resources/Level-*.md` (or `Resources/Extras.md` for cross-cutting/optional material).
+   - Add a short reference to the module's **📚 Resources** line in `Plan/01…04`.
+   - Update `Dashboard/topics.json` **only if a topic genuinely changes** — then run `node Dashboard/sync.js` (do not hand-edit `index.html`).
+3. Log what was wired in `Sessions/_MASTER.md`.
+4. If a new file has no obvious home, ask the student where it should fit rather than silently dropping it.
+
 ## Updating shared memory
 At the **end** of each session (or when the student finishes a topic), update the module's session file:
 - Move finished agenda items into "✅ Covered So Far".

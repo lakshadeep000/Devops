@@ -69,9 +69,8 @@ The dashboard's **chat ↗** links open each module's session page in the openco
 
 | Module | Status |
 |--------|--------|
-| **L1-M1** Linux — basics | ✅ Day 1 |
-| **L1-M1** Linux — deep (processes, systemd, special perms) | ⬜ next |
-| **L1-M2** Bash scripting | ⬜ |
+| **L1-M1** Linux — basics + deep | ✅ done |
+| **L1-M2** Bash scripting | ⬜ next |
 | **L1-M3** Text tools | ⬜ |
 | **L1-M4** Git | ⬜ |
 | **L1-M5** Markdown & YAML | ⬜ |

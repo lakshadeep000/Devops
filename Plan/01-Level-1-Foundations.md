@@ -24,21 +24,29 @@
 - **Package management**: `apt`, `dpkg`, installing/removing/pinning packages
 - **Filesystems**: `/proc` and `/sys` as virtual filesystems, mount points, inodes
 - **Boot sequence**: BIOS/UEFI → GRUB → kernel → init/systemd (conceptual)
+- **System logging**: journald (persistence/vacuum/config), rsyslog (facilities/priorities/modules), `/var/log/*` hierarchy, logrotate rules, auditd
+- **Cross-platform logging**: BSD syslogd + newsyslog + periodic, Solaris SMF/logadm/fmd, AIX errpt/alog/srcmstr — the config-path atlas
+- **System monitoring & performance analysis**: sysstat (`sar`, `iostat`, `mpstat`), atop, vmstat/dstat, threshold alerting, cross-platform health-check scripts
 
 ### 🛡️ Production-grade focus
 - **Day-2 reality**: this module is *the* on-call foundation. Every outage debrief eventually becomes "what did the server do and why?" — that's `ps`, `free`, `journalctl`, and `/proc`.
 - **Failure modes to know**: disk full (`df` at 90% = panic), runaway process pegging CPU (`top`, `yes` trick), OOM (swap + `free -h`), crashed service (systemd `Restart=on-failure`), zombie/stopped processes.
 - **Ops checklist**: never `kill -9` first (TERM, wait, escalate); audit `find / -perm -4000`; write systemd units with `Restart`, `TimeoutSec`, `User=`, `LimitNOFILE`; know your host's CPU count vs load average before you say "it's slow".
-- **Resources**: [[Resources/Level-1-Foundations|Level 1 resources]] → *The Linux Command Line* ch 1–11 (filesystem, permissions, processes, environment); `man systemd.unit` + `man systemd.service` for the unit fields that matter. 🐙 [Linux bootcamp repo](https://github.com/PacktPublishing/The-Ultimate-Linux-Bootcamp-for-DevOps-SRE-and-Cloud-Engineers); 📕 [[LinuxNotesForProfessionals.pdf]].
+- **Resources**: [[Resources/Level-1-Foundations|Level 1 resources]] → *The Linux Command Line* ch 1–11 (filesystem, permissions, processes, environment); `man systemd.unit` + `man systemd.service` for the unit fields that matter. 🐙 [Linux bootcamp repo](https://github.com/PacktPublishing/The-Ultimate-Linux-Bootcamp-for-DevOps-SRE-and-Cloud-Engineers); 📕 [[LinuxNotesForProfessionals.pdf]]; 📕 250 Linux scenario Q&A drill — [[DevOps Shack _ 250 Linux Scenario Based Q and A (1).pdf]]; 📖 [[Resources/Cross-Platform-Logging-Monitoring|Cross-platform logging & monitoring atlas]] (BSD/Solaris/AIX/HP-UX matrix).
 
 ### 🛠️ Lab ideas
 - Recreate the Day 1 permissions experiment **including sticky + setuid**
 - Write + enable your own `systemd` service that runs a script on boot
 - Stress the system with a busy loop, watch it in `top`, then `kill` it correctly
 - Answer "why is `/tmp` different from `/var/tmp`?" by reading the docs, not guessing
+- Make journald persistent, cap its disk use with `SystemMaxUse`, then vacuum old logs
+- Add an rsyslog rule forwarding `auth.*` to a remote collector; write a custom logrotate rule and dry-run it
+- Write an auditd rule for `/etc/passwd` writes, trigger it, read `ausearch`
+- Enable sysstat, generate I/O load, and interpret the `sar -d` output
+- Script a cross-platform health-check report (disk/mem/load/top processes) you could drop on any Linux box
 
 ### 🎯 Checkpoint
-From a blank screen: create a user, give them sudo, write a service file for a script, start/enable it, verify via `journalctl`, and explain every column of `ps aux`. Explain sticky bit vs setuid with an example each.
+From a blank screen: create a user, give them sudo, write a service file for a script, start/enable it, verify via `journalctl`, and explain every column of `ps aux`. Explain sticky bit vs setuid with an example each. Explain how log rotation differs on FreeBSD (`newsyslog`) vs Linux (`logrotate`), what Solaris SMF replaces vs systemd units, and what AIX's `errpt` gives you that syslog doesn't.
 
 ---
 
@@ -62,10 +70,10 @@ From a blank screen: create a user, give them sudo, write a service file for a s
 - **Day-2 reality**: your scripts run unattended in cron/systemd/CI — nobody is there to babysit. Exit codes, logging, and idempotency are *not* optional.
 - **Failure modes to know**: script "works" interactively but fails in cron (missing env/PATH); `rm -rf $DIR` on an empty var (quote *everything*); partial failure mid-run; secret echo'd into logs; zombie background jobs.
 - **Ops checklist**: `set -euo pipefail` in every script; timestamped logs with a log dir; `trap` cleanup for temp files/locks; exit non-zero on failure; add a lock file for cron re-entry; run `shellcheck` before shipping.
-- **Resources**: [[Resources/Level-1-Foundations|Level 1 resources]] → *Bash Guide* (compound commands + parameter expansion sections); GNU Bash manual ch 3.5 (expansion); https://www.shellcheck.net as your lint gate. 🐙 [Bash cookbook](https://github.com/PacktPublishing/Linux-Shell-Scripting-Cookbook-Third-Edition); 📕 [[BashNotesForProfessionals.pdf]].
+- **Resources**: [[Resources/Level-1-Foundations|Level 1 resources]] → *Bash Guide* (compound commands + parameter expansion sections); GNU Bash manual ch 3.5 (expansion); https://www.shellcheck.net as your lint gate. 🐙 [Bash cookbook](https://github.com/PacktPublishing/Linux-Shell-Scripting-Cookbook-Third-Edition) — **local clone at** `Resources/Packt/Linux-Shell-Scripting-Cookbook-Third-Edition/`: **Chapter02 `backup.sh` = the M2 checkpoint skeleton (find-based backup)**, Chapter03 `remove_duplicates` (M3), Chapter09 `intruder_detect.sh` + `pcpu.sh` (M1/M7); 📕 [[BashNotesForProfessionals.pdf]].
 
 ### 🛠️ Lab ideas (write these in `Scripts/`)
-- A backup script with rotation (keep last 7 copies) + trap cleanup
+- **Use `Resources/Packt/Linux-Shell-Scripting-Cookbook-Third-Edition/Chapter02/backup.sh` as the skeleton** — add rotation (keep last 7 copies), `trap` cleanup, `set -euo pipefail`, timestamped logfile, `-h` flag
 - A log parser using grep/awk that produces a summary report
 - A disk-usage alert script that emails/warns when `df` crosses a threshold
 - A script that takes flags (`-f file -v`) via getopts
@@ -122,7 +130,7 @@ Given a real access-log-format file: produce (1) top-10 IPs, (2) count of 5xx, (
 - **Day-2 reality**: in GitOps and on-call, Git is the *audit trail* — every change is reviewable and (usually) revertible. How you commit determines how well you can bisect and roll back.
 - **Failure modes to know**: a secret committed 50 commits ago (must use `git filter-repo`/BFG + rotate, not just delete); force-push overwriting teammates' work; broken `main`; large binary blobs bloating the repo; lost work recovered via `reflog`.
 - **Ops checklist**: atomic commits with messages that explain *why*; branch protection on `main`; PR review before merge; tags for releases; `git revert` as the standard rollback (not `reset --hard` on shared branches); sign your commits.
-- **Resources**: [[Resources/Level-1-Foundations|Level 1 resources]] → *Pro Git* ch 3 (branching), 7 (rebase/reset), 10 (internals/reflog); https://learngitbranching.js.org; GitHub docs on branch protection. 🐙 [GitHub Foundations repo](https://github.com/PacktPublishing/GitHub-Foundations-Certification-Guide).
+- **Resources**: [[Resources/Level-1-Foundations|Level 1 resources]] → *Pro Git* ch 3 (branching), 7 (rebase/reset), 10 (internals/reflog); https://learngitbranching.js.org; GitHub docs on branch protection. 🐙 [GitHub Foundations repo](https://github.com/PacktPublishing/GitHub-Foundations-Certification-Guide); 📕 [[GitNotesForProfessionals.pdf]].
 
 ### 🛠️ Lab ideas
 - Create a repo, intentionally create a conflict, resolve it both by merge and rebase
